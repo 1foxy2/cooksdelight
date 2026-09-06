@@ -1,0 +1,7 @@
+package net.foxy.cooksdelight.data;
+
+import net.minecraft.world.item.crafting.CraftingRecipe;
+
+public interface StoveRecipe extends CraftingRecipe {
+
+}

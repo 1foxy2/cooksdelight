@@ -37,7 +37,7 @@ public class StoveMenu extends RecipeBookMenu<SingleRecipeInput, AbstractCooking
     public StoveMenu(
             int containerId, Inventory playerInventory, RegistryFriendlyByteBuf data
     ) {
-        this(containerId, playerInventory, new SimpleContainer(3), new SimpleContainerData(4));
+        this(containerId, playerInventory, new SimpleContainer(10), new SimpleContainerData(4));
     }
 
     public StoveMenu(
@@ -49,14 +49,17 @@ public class StoveMenu extends RecipeBookMenu<SingleRecipeInput, AbstractCooking
         super(CDMenus.STOVE.get(), containerId);
         this.recipeType = RecipeType.SMELTING;
         this.recipeBookType = RecipeBookType.FURNACE;
-        checkContainerSize(container, 3);
+        checkContainerSize(container, 10);
         checkContainerDataCount(data, 4);
         this.container = container;
         this.data = data;
         this.level = playerInventory.player.level();
-        this.addSlot(new Slot(container, 0, 56, 17));
+        this.addSlot(new FurnaceResultSlot(playerInventory.player, container, 9, 127, 35));
+
+        for (int i = 0; i < 9; i++) {
+            this.addSlot(new Slot(container, i, 30 + (i % 3) * 18, 17 + (i / 3) * 18));
+        }
         //this.addSlot(new FurnaceFuelSlot(this, container, 1, 56, 53));
-        this.addSlot(new FurnaceResultSlot(playerInventory.player, container, 2, 116, 35));
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 9; j++) {
@@ -80,8 +83,9 @@ public class StoveMenu extends RecipeBookMenu<SingleRecipeInput, AbstractCooking
 
     @Override
     public void clearCraftingContent() {
-        this.getSlot(0).set(ItemStack.EMPTY);
-        this.getSlot(2).set(ItemStack.EMPTY);
+        for (int i = 0; i < 10; i++) {
+            this.getSlot(i).set(ItemStack.EMPTY);
+        }
     }
 
     @Override
@@ -91,22 +95,22 @@ public class StoveMenu extends RecipeBookMenu<SingleRecipeInput, AbstractCooking
 
     @Override
     public int getResultSlotIndex() {
-        return 2;
+        return 0;
     }
 
     @Override
     public int getGridWidth() {
-        return 1;
+        return 3;
     }
 
     @Override
     public int getGridHeight() {
-        return 1;
+        return 3;
     }
 
     @Override
     public int getSize() {
-        return 3;
+        return 10;
     }
 
     /**
@@ -124,32 +128,26 @@ public class StoveMenu extends RecipeBookMenu<SingleRecipeInput, AbstractCooking
     public @NotNull ItemStack quickMoveStack(@NotNull Player player, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
-        if (slot.hasItem()) {
+        if (slot != null && slot.hasItem()) {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
-            if (index == 2) {
-                if (!this.moveItemStackTo(itemstack1, 3, 39, true)) {
+            if (index == 0) {
+                if (!this.moveItemStackTo(itemstack1, 10, 46, true)) {
                     return ItemStack.EMPTY;
                 }
 
                 slot.onQuickCraft(itemstack1, itemstack);
-            } else if (index != 1 && index != 0) {
-                if (this.canSmelt(itemstack1)) {
-                    if (!this.moveItemStackTo(itemstack1, 0, 1, false)) {
+            } else if (index >= 10 && index < 46) {
+                if (!this.moveItemStackTo(itemstack1, 1, 10, false)) {
+                    if (index < 37) {
+                        if (!this.moveItemStackTo(itemstack1, 37, 46, false)) {
+                            return ItemStack.EMPTY;
+                        }
+                    } else if (!this.moveItemStackTo(itemstack1, 10, 37, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (this.isFuel(itemstack1)) {
-                    if (!this.moveItemStackTo(itemstack1, 1, 2, false)) {
-                        return ItemStack.EMPTY;
-                    }
-                } else if (index >= 3 && index < 30) {
-                    if (!this.moveItemStackTo(itemstack1, 30, 39, false)) {
-                        return ItemStack.EMPTY;
-                    }
-                } else if (index >= 30 && index < 39 && !this.moveItemStackTo(itemstack1, 3, 30, false)) {
-                    return ItemStack.EMPTY;
                 }
-            } else if (!this.moveItemStackTo(itemstack1, 3, 39, false)) {
+            } else if (!this.moveItemStackTo(itemstack1, 10, 46, false)) {
                 return ItemStack.EMPTY;
             }
 
@@ -164,6 +162,9 @@ public class StoveMenu extends RecipeBookMenu<SingleRecipeInput, AbstractCooking
             }
 
             slot.onTake(player, itemstack1);
+            if (index == 0) {
+                player.drop(itemstack1, false);
+            }
         }
 
         return itemstack;

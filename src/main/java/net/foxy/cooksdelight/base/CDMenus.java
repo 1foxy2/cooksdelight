@@ -10,7 +10,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class CDMenus {
     public static final DeferredRegister<MenuType<?>> MENUS =
-            DeferredRegister.create(Registries.MENU, CooksDelightMod.MODID);
+            DeferredRegister.create(Registries.MENU, CooksDelightMod.MOD_ID);
 
     public static final DeferredHolder<MenuType<?>, MenuType<StoveMenu>> STOVE =
             MENUS.register("stove", () -> IMenuTypeExtension.create(StoveMenu::new));

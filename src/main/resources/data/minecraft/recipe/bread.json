@@ -1,0 +1,13 @@
+{
+  "type": "cooksdelight:stove_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:foods/dough/wheat"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:bread"
+  }
+}

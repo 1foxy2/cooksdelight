@@ -1,5 +1,6 @@
 package net.foxy.cooksdelight.screen;
 
+import net.foxy.cooksdelight.CooksDelightMod;
 import net.foxy.cooksdelight.menu.StoveMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
@@ -15,15 +16,16 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 
+import java.awt.*;
+
 public class StoveScreen extends AbstractContainerScreen<StoveMenu> implements RecipeUpdateListener {
-    private static final ResourceLocation LIT_PROGRESS_SPRITE = ResourceLocation.withDefaultNamespace("container/furnace/lit_progress");
     private static final ResourceLocation BURN_PROGRESS_SPRITE = ResourceLocation.withDefaultNamespace("container/furnace/burn_progress");
-    private static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace("textures/gui/container/furnace.png");
+    private static final ResourceLocation TEXTURE = CooksDelightMod.id("textures/gui/container/stove.png");
     public final AbstractFurnaceRecipeBookComponent recipeBookComponent;
     private boolean widthTooNarrow;
     private final ResourceLocation texture;
-    private final ResourceLocation litProgressSprite;
     private final ResourceLocation burnProgressSprite;
+    private static final Rectangle HEAT_ICON = new Rectangle(47, 55, 17, 15);
 
     public StoveScreen(
             StoveMenu menu,
@@ -33,7 +35,6 @@ public class StoveScreen extends AbstractContainerScreen<StoveMenu> implements R
         super(menu, playerInventory, title);
         this.recipeBookComponent = new SmeltingRecipeBookComponent();
         this.texture = TEXTURE;
-        this.litProgressSprite = LIT_PROGRESS_SPRITE;
         this.burnProgressSprite = BURN_PROGRESS_SPRITE;
     }
 
@@ -43,10 +44,10 @@ public class StoveScreen extends AbstractContainerScreen<StoveMenu> implements R
         this.widthTooNarrow = this.width < 379;
         this.recipeBookComponent.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
         this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
-        this.addRenderableWidget(new ImageButton(this.leftPos + 20, this.height / 2 - 49, 20, 18, RecipeBookComponent.RECIPE_BUTTON_SPRITES, p_313431_ -> {
+        this.addRenderableWidget(new ImageButton(this.leftPos + 5, this.height / 2 - 49, 20, 18, RecipeBookComponent.RECIPE_BUTTON_SPRITES, p_313431_ -> {
             this.recipeBookComponent.toggleVisibility();
             this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
-            p_313431_.setPosition(this.leftPos + 20, this.height / 2 - 49);
+            p_313431_.setPosition(this.leftPos + 5, this.height / 2 - 49);
         }));
         this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2;
     }
@@ -82,18 +83,16 @@ public class StoveScreen extends AbstractContainerScreen<StoveMenu> implements R
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        int i = this.leftPos;
-        int j = this.topPos;
-        guiGraphics.blit(this.texture, i, j, 0, 0, this.imageWidth, this.imageHeight);
+        int x = this.leftPos;
+        int y = this.topPos;
+        guiGraphics.blit(this.texture, x, y, 0, 0, this.imageWidth, this.imageHeight);
         if (this.menu.isLit()) {
-            int k = 14;
-            int l = Mth.ceil(this.menu.getLitProgress() * 13.0F) + 1;
-            guiGraphics.blitSprite(this.litProgressSprite, 14, 14, 0, 14 - l, i + 56, j + 36 + 14 - l, 14, l);
+            guiGraphics.blit(TEXTURE, this.leftPos + 126, this.topPos + 58, 176, 0, 17, 15);
         }
 
         int i1 = 24;
         int j1 = Mth.ceil(this.menu.getBurnProgress() * 24.0F);
-        guiGraphics.blitSprite(this.burnProgressSprite, 24, 16, 0, 0, i + 79, j + 34, j1, 16);
+        guiGraphics.blitSprite(this.burnProgressSprite, 24, 16, 0, 0, x + 89, y + 34, j1, 16);
     }
 
     /**

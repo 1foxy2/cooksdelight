@@ -26,15 +26,16 @@ public class AbstractStoveBlockEntityMixin implements StoveContainerHolder {
 
     @Inject(
             method = "serverTick",
-            at = @At("TAIL")
+            at = @At("RETURN")
     )
-    private static void tickStoveContainer(Level level, BlockPos pos, BlockState state, AbstractStoveBlockEntity stoveEntity, CallbackInfo ci) {
+    private static void tickStoveContainer(Level level, BlockPos pos, BlockState state,
+                                           AbstractStoveBlockEntity stoveEntity, CallbackInfo ci) {
         StoveContainer.serverTick(level, pos, state, ((StoveContainerHolder) stoveEntity).cooksdelight$getStoveContainer());
     }
 
     @Inject(
             method = "loadAdditional",
-            at = @At("TAIL")
+            at = @At("RETURN")
     )
     private void loadStoveContainer(CompoundTag tag, HolderLookup.Provider registries, CallbackInfo ci) {
         cooksdelight$stoveContainer.loadAdditional(tag.getCompound("cooksdelight_stove_container"), registries);
@@ -42,11 +43,19 @@ public class AbstractStoveBlockEntityMixin implements StoveContainerHolder {
 
     @Inject(
             method = "saveAdditional",
-            at = @At("TAIL")
+            at = @At("RETURN")
     )
     private void saveStoveContainer(CompoundTag tag, HolderLookup.Provider registries, CallbackInfo ci) {
         CompoundTag stoveContainerTag = new CompoundTag();
         cooksdelight$stoveContainer.saveAdditional(stoveContainerTag, registries);
         tag.put("cooksdelight_stove_container", stoveContainerTag);
+    }
+
+    @Inject(
+            method = "clearContent",
+            at = @At("RETURN")
+    )
+    private void clearStoveContainer(CallbackInfo ci) {
+        cooksdelight$stoveContainer.clearContent();
     }
 }

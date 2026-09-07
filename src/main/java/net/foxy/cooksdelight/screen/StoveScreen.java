@@ -30,7 +30,7 @@ public class StoveScreen extends AbstractContainerScreen<StoveMenu> implements R
             Component title
     ) {
         super(menu, playerInventory, title);
-        this.recipeBookComponent = new RecipeBookComponent();
+        this.recipeBookComponent = new StoveRecipeBookComponent();
         this.texture = TEXTURE;
         this.burnProgressSprite = BURN_PROGRESS_SPRITE;
     }

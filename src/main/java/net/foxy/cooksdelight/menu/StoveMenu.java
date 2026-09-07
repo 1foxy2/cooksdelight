@@ -207,10 +207,4 @@ public class StoveMenu extends RecipeBookMenu<CraftingInput, StoveRecipe> {
     public boolean shouldMoveToInventory(int slotIndex) {
         return slotIndex != 1;
     }
-
-    @Override
-    public List<RecipeBookCategories> getRecipeBookCategories() {
-        LogUtils.getLogger().warn(super.getRecipeBookCategories().toString());
-        return super.getRecipeBookCategories();
-    }
 }

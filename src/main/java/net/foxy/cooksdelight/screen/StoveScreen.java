@@ -25,7 +25,8 @@ public class StoveScreen extends AbstractContainerScreen<StoveMenu> implements R
     private boolean widthTooNarrow;
     private final ResourceLocation texture;
     private final ResourceLocation burnProgressSprite;
-    private static final Rectangle HEAT_ICON = new Rectangle(47, 55, 17, 15);
+    private final Component HEATED = Component.translatable("gui.cooksdelight.stove_heated");
+    private final Component NOT_HEATED = Component.translatable("gui.cooksdelight.stove_not_heated");
 
     public StoveScreen(
             StoveMenu menu,
@@ -79,6 +80,10 @@ public class StoveScreen extends AbstractContainerScreen<StoveMenu> implements R
 
         this.renderTooltip(guiGraphics, mouseX, mouseY);
         this.recipeBookComponent.renderTooltip(guiGraphics, this.leftPos, this.topPos, mouseX, mouseY);
+        if (leftPos + 126 < mouseX && mouseX < leftPos + 126 + 17 &&
+                topPos + 58 < mouseY &&  mouseY < topPos + 58 + 15) {
+            guiGraphics.renderTooltip(font, this.menu.isLit() ? HEATED : NOT_HEATED, mouseX, mouseY);
+        }
     }
 
     @Override

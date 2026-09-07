@@ -14,9 +14,24 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
 public class ShapelessStoveRecipe extends ShapelessRecipe implements StoveRecipe {
+    protected final float experience;
+    protected final int cookingTime;
 
-    public ShapelessStoveRecipe(String group, CraftingBookCategory category, ItemStack result, NonNullList<Ingredient> ingredients) {
+    public ShapelessStoveRecipe(String group, CraftingBookCategory category, ItemStack result,
+                                NonNullList<Ingredient> ingredients, float experience, int cookingTime) {
         super(group, category, result, ingredients);
+        this.experience = experience;
+        this.cookingTime = cookingTime;
+    }
+
+    @Override
+    public float getExperience() {
+        return experience;
+    }
+
+    @Override
+    public int getCookingTime() {
+        return cookingTime;
     }
 
     @Override
@@ -62,7 +77,9 @@ public class ShapelessStoveRecipe extends ShapelessRecipe implements StoveRecipe
                                                 },
                                                 DataResult::success
                                         )
-                                        .forGetter(ShapelessRecipe::getIngredients)
+                                        .forGetter(ShapelessRecipe::getIngredients),
+                                Codec.FLOAT.optionalFieldOf("experience", 2.0F).forGetter(StoveRecipe::getExperience),
+                                Codec.INT.optionalFieldOf("cookingtime", 300).forGetter(StoveRecipe::getCookingTime)
                         )
                         .apply(instance, ShapelessStoveRecipe::new)
         );
@@ -87,7 +104,9 @@ public class ShapelessStoveRecipe extends ShapelessRecipe implements StoveRecipe
             NonNullList<Ingredient> nonnulllist = NonNullList.withSize(i, Ingredient.EMPTY);
             nonnulllist.replaceAll(p_319735_ -> Ingredient.CONTENTS_STREAM_CODEC.decode(buffer));
             ItemStack itemstack = ItemStack.STREAM_CODEC.decode(buffer);
-            return new ShapelessStoveRecipe(s, craftingbookcategory, itemstack, nonnulllist);
+            float exp = buffer.readFloat();
+            int cookingTime = buffer.readInt();
+            return new ShapelessStoveRecipe(s, craftingbookcategory, itemstack, nonnulllist, exp, cookingTime);
         }
 
         private static void toNetwork(RegistryFriendlyByteBuf buffer, ShapelessStoveRecipe recipe) {
@@ -100,6 +119,8 @@ public class ShapelessStoveRecipe extends ShapelessRecipe implements StoveRecipe
             }
 
             ItemStack.STREAM_CODEC.encode(buffer, recipe.getResultItem(buffer.registryAccess()));
+            buffer.writeFloat(recipe.getExperience());
+            buffer.writeInt(recipe.getCookingTime());
         }
     }
 }

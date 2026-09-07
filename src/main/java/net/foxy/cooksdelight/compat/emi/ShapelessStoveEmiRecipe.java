@@ -1,18 +1,21 @@
 package net.foxy.cooksdelight.compat.emi;
 
-import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.EmiPort;
+import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.recipe.EmiShapedRecipe;
-import dev.emi.emi.recipe.EmiShapelessRecipe;
 import net.foxy.cooksdelight.data.ShapelessStoveRecipe;
-import net.minecraft.world.item.crafting.ShapedRecipe;
 
-public class ShapelessStoveEmiRecipe extends EmiShapelessRecipe {
+public class ShapelessStoveEmiRecipe extends StoveEmiRecipe {
+
     public ShapelessStoveEmiRecipe(ShapelessStoveRecipe recipe) {
-        super(recipe);
+        super(recipe.getIngredients().stream().map(i -> EmiIngredient.of(i)).toList(),
+                EmiStack.of(EmiPort.getOutput(recipe)), EmiPort.getId(recipe), true, recipe.getCookingTime(), recipe.getExperience());
+        EmiShapedRecipe.setRemainders(input, recipe);
     }
 
     @Override
-    public EmiRecipeCategory getCategory() {
-        return CooksDelightEmiPlugin.STOVE_CATEGORY;
+    public boolean canFit(int width, int height) {
+        return input.size() <= width * height;
     }
 }

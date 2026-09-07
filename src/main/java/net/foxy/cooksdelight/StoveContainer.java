@@ -1,10 +1,10 @@
 package net.foxy.cooksdelight;
 
-import com.mojang.logging.LogUtils;
+import com.google.common.collect.Lists;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.foxy.cooksdelight.base.CDBSP;
 import net.foxy.cooksdelight.base.CDRecipeTypes;
-import net.foxy.cooksdelight.data.ShapedStoveRecipe;
 import net.foxy.cooksdelight.data.StoveRecipe;
 import net.foxy.cooksdelight.menu.StoveMenu;
 import net.minecraft.SharedConstants;
@@ -14,10 +14,13 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.*;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedContents;
@@ -35,9 +38,9 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.Vec3;
 import vectorwing.farmersdelight.common.block.entity.AbstractStoveBlockEntity;
 
 import javax.annotation.Nullable;
@@ -98,6 +101,7 @@ public class StoveContainer implements WorldlyContainer, MenuProvider, RecipeCra
             return 4;
         }
     };
+    private final Object2IntOpenHashMap<ResourceLocation> recipesUsed = new Object2IntOpenHashMap<>();
     private final RecipeManager.CachedCheck<CraftingInput, StoveRecipe> quickCheck;
     public final AbstractStoveBlockEntity blockEntity;
 
@@ -114,6 +118,11 @@ public class StoveContainer implements WorldlyContainer, MenuProvider, RecipeCra
         this.cookingProgress = tag.getInt("CookTime");
         this.cookingTotalTime = tag.getInt("CookTimeTotal");
         this.litDuration = this.getBurnDuration(this.items.get(1));
+        CompoundTag compoundtag = tag.getCompound("RecipesUsed");
+
+        for (String s : compoundtag.getAllKeys()) {
+            this.recipesUsed.put(ResourceLocation.parse(s), compoundtag.getInt(s));
+        }
     }
 
     public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
@@ -121,6 +130,9 @@ public class StoveContainer implements WorldlyContainer, MenuProvider, RecipeCra
         tag.putInt("CookTime", this.cookingProgress);
         tag.putInt("CookTimeTotal", this.cookingTotalTime);
         ContainerHelper.saveAllItems(tag, this.items, registries);
+        CompoundTag compoundtag = new CompoundTag();
+        this.recipesUsed.forEach((id, count) -> compoundtag.putInt(id.toString(), count));
+        tag.put("RecipesUsed", compoundtag);
     }
 
 
@@ -175,6 +187,8 @@ public class StoveContainer implements WorldlyContainer, MenuProvider, RecipeCra
                 level.setBlock(pos, state.setValue(BlockStateProperties.LIT, false), 3);
                 blockEntity.litTime = Short.MIN_VALUE;
             }
+        } else {
+            blockEntity.litTime = Short.MIN_VALUE;
         }
 
         boolean isEmpty = blockEntity.isEmpty();
@@ -314,10 +328,9 @@ public class StoveContainer implements WorldlyContainer, MenuProvider, RecipeCra
     }
 
     private static int getTotalCookTime(Level level, StoveContainer blockEntity) {
-        //SingleRecipeInput singlerecipeinput = new SingleRecipeInput(blockEntity.getItem(0));
-        return 300;
-                //blockEntity.quickCheck.getRecipeFor(singlerecipeinput, level) TODO
-                //.map(p_300840_ -> p_300840_.value().getCookingTime()).orElse(200);
+        CraftingInput craftingInput = CraftingInput.of(3, 3, blockEntity.getItems());
+        return blockEntity.quickCheck.getRecipeFor(craftingInput, level)
+                .map(recipe -> recipe.value().getCookingTime()).orElse(200);
     }
 
     public static boolean isFuel(ItemStack stack) {
@@ -395,7 +408,10 @@ public class StoveContainer implements WorldlyContainer, MenuProvider, RecipeCra
 
     @Override
     public void setRecipeUsed(@Nullable RecipeHolder<?> recipe) {
-
+        if (recipe != null) {
+            ResourceLocation resourcelocation = recipe.id();
+            this.recipesUsed.addTo(resourcelocation, 1);
+        }
     }
 
     @Nullable
@@ -472,4 +488,39 @@ public class StoveContainer implements WorldlyContainer, MenuProvider, RecipeCra
     }
 
 
+    public void awardUsedRecipesAndPopExperience(ServerPlayer player) {
+        List<RecipeHolder<?>> list = this.getRecipesToAwardAndPopExperience(player.serverLevel(), player.position());
+        player.awardRecipes(list);
+
+        for (RecipeHolder<?> recipeholder : list) {
+            if (recipeholder != null) {
+                player.triggerRecipeCrafted(recipeholder, this.items);
+            }
+        }
+
+        this.recipesUsed.clear();
+    }
+
+    public List<RecipeHolder<?>> getRecipesToAwardAndPopExperience(ServerLevel level, Vec3 popVec) {
+        List<RecipeHolder<?>> list = Lists.newArrayList();
+
+        for (Object2IntMap.Entry<ResourceLocation> entry : this.recipesUsed.object2IntEntrySet()) {
+            level.getRecipeManager().byKey(entry.getKey()).ifPresent(p_300839_ -> {
+                list.add((RecipeHolder<?>)p_300839_);
+                createExperience(level, popVec, entry.getIntValue(), ((StoveRecipe)p_300839_.value()).getExperience());
+            });
+        }
+
+        return list;
+    }
+
+    private static void createExperience(ServerLevel level, Vec3 popVec, int recipeIndex, float experience) {
+        int i = Mth.floor((float)recipeIndex * experience);
+        float f = Mth.frac((float)recipeIndex * experience);
+        if (f != 0.0F && Math.random() < (double)f) {
+            i++;
+        }
+
+        ExperienceOrb.award(level, popVec, i);
+    }
 }

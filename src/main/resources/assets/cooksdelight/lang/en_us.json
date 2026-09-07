@@ -1,3 +1,5 @@
 {
-  "emi.category.cooksdelight.stove": "Stove"
+  "emi.category.cooksdelight.stove": "Stove",
+  "gui.cooksdelight.stove_heated": "Lit",
+  "gui.cooksdelight.stove_not_heated": "Need a lit stove"
 }

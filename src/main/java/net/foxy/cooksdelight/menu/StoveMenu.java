@@ -54,7 +54,7 @@ public class StoveMenu extends RecipeBookMenu<SingleRecipeInput, AbstractCooking
         this.container = container;
         this.data = data;
         this.level = playerInventory.player.level();
-        this.addSlot(new FurnaceResultSlot(playerInventory.player, container, 9, 127, 35));
+        this.addSlot(new StoveResultSlot(playerInventory.player, container, 9, 127, 35));
 
         for (int i = 0; i < 9; i++) {
             this.addSlot(new Slot(container, i, 30 + (i % 3) * 18, 17 + (i / 3) * 18));

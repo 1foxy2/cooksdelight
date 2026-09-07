@@ -1,6 +1,10 @@
 package net.foxy.cooksdelight.menu;
 
+import com.mojang.logging.LogUtils;
+import net.foxy.cooksdelight.base.CDEnums;
 import net.foxy.cooksdelight.base.CDMenus;
+import net.foxy.cooksdelight.data.StoveRecipe;
+import net.minecraft.client.RecipeBookCategories;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
@@ -11,13 +15,16 @@ import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-public class StoveMenu extends RecipeBookMenu<SingleRecipeInput, AbstractCookingRecipe> {
+import java.util.ArrayList;
+import java.util.List;
+
+public class StoveMenu extends RecipeBookMenu<CraftingInput, StoveRecipe> {
 
     /*public static final int INGREDIENT_SLOT = 0;
     public static final int FUEL_SLOT = 1;
@@ -31,7 +38,6 @@ public class StoveMenu extends RecipeBookMenu<SingleRecipeInput, AbstractCooking
     private final Container container;
     private final ContainerData data;
     protected final Level level;
-    private final RecipeType<? extends AbstractCookingRecipe> recipeType;
     private final RecipeBookType recipeBookType;
 
     public StoveMenu(
@@ -47,8 +53,7 @@ public class StoveMenu extends RecipeBookMenu<SingleRecipeInput, AbstractCooking
             ContainerData data
     ) {
         super(CDMenus.STOVE.get(), containerId);
-        this.recipeType = RecipeType.SMELTING;
-        this.recipeBookType = RecipeBookType.FURNACE;
+        this.recipeBookType = CDEnums.STOVE.getValue();
         checkContainerSize(container, 10);
         checkContainerDataCount(data, 4);
         this.container = container;
@@ -89,8 +94,12 @@ public class StoveMenu extends RecipeBookMenu<SingleRecipeInput, AbstractCooking
     }
 
     @Override
-    public boolean recipeMatches(RecipeHolder<AbstractCookingRecipe> recipe) {
-        return recipe.value().matches(new SingleRecipeInput(this.container.getItem(0)), this.level);
+    public boolean recipeMatches(RecipeHolder<StoveRecipe> recipe) {
+        List<ItemStack> stacks = new ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            stacks.add(this.container.getItem(i));
+        }
+        return recipe.value().matches(CraftingInput.of(3, 3, stacks), this.level);
     }
 
     @Override
@@ -170,14 +179,6 @@ public class StoveMenu extends RecipeBookMenu<SingleRecipeInput, AbstractCooking
         return itemstack;
     }
 
-    protected boolean canSmelt(ItemStack stack) {
-        return this.level.getRecipeManager().getRecipeFor(this.recipeType, new SingleRecipeInput(stack), this.level).isPresent();
-    }
-
-    protected boolean isFuel(ItemStack stack) {
-        return stack.getBurnTime(this.recipeType) > 0;
-    }
-
     public float getBurnProgress() {
         int i = this.data.get(2);
         int j = this.data.get(3);
@@ -205,5 +206,11 @@ public class StoveMenu extends RecipeBookMenu<SingleRecipeInput, AbstractCooking
     @Override
     public boolean shouldMoveToInventory(int slotIndex) {
         return slotIndex != 1;
+    }
+
+    @Override
+    public List<RecipeBookCategories> getRecipeBookCategories() {
+        LogUtils.getLogger().warn(super.getRecipeBookCategories().toString());
+        return super.getRecipeBookCategories();
     }
 }

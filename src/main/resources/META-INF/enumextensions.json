@@ -1,0 +1,22 @@
+{
+  "entries": [
+    {
+      "enum": "net/minecraft/world/inventory/RecipeBookType",
+      "name": "COOKSDELIGHT_STOVE",
+      "constructor": "()V",
+      "parameters": {
+        "class": "net/foxy/cooksdelight/base/CDEnums",
+        "field": "STOVE"
+      }
+    },
+    {
+      "enum": "net/minecraft/client/RecipeBookCategories",
+      "name": "COOKSDELIGHT_STOVE_FOOD",
+      "constructor": "(Ljava/util/function/Supplier;)V",
+      "parameters": {
+        "class": "net/foxy/cooksdelight/base/CDEnums",
+        "field": "STOVE_FOOD"
+      }
+    }
+  ]
+}

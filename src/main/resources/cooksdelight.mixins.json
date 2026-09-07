@@ -3,13 +3,19 @@
   "minVersion": "0.8",
   "package": "net.foxy.cooksdelight.mixin",
   "compatibilityLevel": "JAVA_21",
-  "client": [],
+  "client": [
+
+  ],
   "injectors": {
     "defaultRequire": 1
+  },
+  "mixinextras": {
+    "minVersion": "0.5.3"
   },
   "mixins": [
     "AbstractStoveBlockEntityMixin",
     "AbstractStoveBlockMixin",
+    "ClientRecipeBookMixin",
     "RecipeManagerMixin"
   ]
 }

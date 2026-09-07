@@ -5,10 +5,8 @@ import net.foxy.cooksdelight.menu.StoveMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.recipebook.AbstractFurnaceRecipeBookComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
-import net.minecraft.client.gui.screens.recipebook.SmeltingRecipeBookComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -16,12 +14,10 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 
-import java.awt.*;
-
 public class StoveScreen extends AbstractContainerScreen<StoveMenu> implements RecipeUpdateListener {
     private static final ResourceLocation BURN_PROGRESS_SPRITE = ResourceLocation.withDefaultNamespace("container/furnace/burn_progress");
     private static final ResourceLocation TEXTURE = CooksDelightMod.id("textures/gui/container/stove.png");
-    public final AbstractFurnaceRecipeBookComponent recipeBookComponent;
+    public final RecipeBookComponent recipeBookComponent;
     private boolean widthTooNarrow;
     private final ResourceLocation texture;
     private final ResourceLocation burnProgressSprite;
@@ -34,7 +30,7 @@ public class StoveScreen extends AbstractContainerScreen<StoveMenu> implements R
             Component title
     ) {
         super(menu, playerInventory, title);
-        this.recipeBookComponent = new SmeltingRecipeBookComponent();
+        this.recipeBookComponent = new RecipeBookComponent();
         this.texture = TEXTURE;
         this.burnProgressSprite = BURN_PROGRESS_SPRITE;
     }

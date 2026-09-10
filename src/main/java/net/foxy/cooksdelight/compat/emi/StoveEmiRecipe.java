@@ -12,7 +12,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import vectorwing.farmersdelight.common.utility.ClientRenderUtils;
-import vectorwing.farmersdelight.common.utility.RecipeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,14 +47,14 @@ public class StoveEmiRecipe extends EmiCraftingRecipe {
     }
 
     private List<ClientTooltipComponent> createTooltipComponents() {
-        List<ClientTooltipComponent> tooltipStrings = new ArrayList();
+        List<ClientTooltipComponent> tooltipStrings = new ArrayList<>();
         if (this.cookTime > 0) {
             int cookTimeSeconds = this.cookTime / 20;
-            tooltipStrings.add(ClientTooltipComponent.create(Component.translatable("emi.cooking.time", new Object[]{cookTimeSeconds}).getVisualOrderText()));
+            tooltipStrings.add(ClientTooltipComponent.create(Component.translatable("emi.cooking.time", cookTimeSeconds).getVisualOrderText()));
         }
 
         if (this.experience > 0.0F) {
-            tooltipStrings.add(ClientTooltipComponent.create(Component.translatable("emi.cooking.experience", new Object[]{this.experience}).getVisualOrderText()));
+            tooltipStrings.add(ClientTooltipComponent.create(Component.translatable("emi.cooking.experience", this.experience).getVisualOrderText()));
         }
 
         return tooltipStrings;

@@ -4,7 +4,6 @@
   "package": "net.foxy.cooksdelight.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-
   ],
   "injectors": {
     "defaultRequire": 1
@@ -15,7 +14,6 @@
   "mixins": [
     "AbstractStoveBlockEntityMixin",
     "AbstractStoveBlockMixin",
-    "ClientRecipeBookMixin",
-    "RecipeManagerMixin"
+    "ClientRecipeBookMixin"
   ]
 }

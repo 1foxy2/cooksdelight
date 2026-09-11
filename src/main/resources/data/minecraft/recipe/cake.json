@@ -12,7 +12,7 @@
       "tag": "c:foods/dough/wheat"
     },
     "E": {
-      "item": "minecraft:egg"
+      "tag": "c:eggs"
     }
   },
   "pattern": [

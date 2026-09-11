@@ -18,6 +18,9 @@ enumExtensions="META-INF/enumextensions.json"
 config="${mod_id}.mixins.json"
 
 [modproperties.modmenu]
+links=[
+    "modmenu.discord=https://discord.gg/GTYvTWfzxt"
+]
 sources="https://github.com/1foxy2/cooksdelight"
 
 [[dependencies.${mod_id}]]
@@ -31,5 +34,12 @@ sources="https://github.com/1foxy2/cooksdelight"
     modId="minecraft"
     type="required"
     versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="farmersdelight"
+    type="required"
+    versionRange="[1.3.4, )"
     ordering="NONE"
     side="BOTH"

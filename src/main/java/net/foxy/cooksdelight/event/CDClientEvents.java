@@ -1,5 +1,6 @@
 package net.foxy.cooksdelight.event;
 
+import net.foxy.cooksdelight.base.CDClientEnums;
 import net.foxy.cooksdelight.base.CDEnums;
 import net.foxy.cooksdelight.base.CDMenus;
 import net.foxy.cooksdelight.base.CDRecipeTypes;
@@ -23,8 +24,8 @@ public class CDClientEvents {
 
     @SubscribeEvent
     public static void registerRecipeBookCategories(RegisterRecipeBookCategoriesEvent event) {
-        event.registerAggregateCategory(CDEnums.STOVE_FOOD.getValue(), List.of(CDEnums.STOVE_FOOD.getValue()));
-        event.registerBookCategories(CDEnums.STOVE.getValue(), List.of(CDEnums.STOVE_FOOD.getValue()));
-        event.registerRecipeCategoryFinder(CDRecipeTypes.STOVE.get(), r -> CDEnums.STOVE_FOOD.getValue());
+        event.registerAggregateCategory(CDClientEnums.STOVE_FOOD.getValue(), List.of(CDClientEnums.STOVE_FOOD.getValue()));
+        event.registerBookCategories(CDEnums.STOVE.getValue(), List.of(CDClientEnums.STOVE_FOOD.getValue()));
+        event.registerRecipeCategoryFinder(CDRecipeTypes.STOVE.get(), r -> CDClientEnums.STOVE_FOOD.getValue());
     }
 }

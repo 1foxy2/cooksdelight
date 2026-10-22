@@ -14,7 +14,7 @@
       "name": "COOKSDELIGHT_STOVE_FOOD",
       "constructor": "(Ljava/util/function/Supplier;)V",
       "parameters": {
-        "class": "net/foxy/cooksdelight/base/CDEnums",
+        "class": "net/foxy/cooksdelight/base/CDClientEnums",
         "field": "STOVE_FOOD"
       }
     }
